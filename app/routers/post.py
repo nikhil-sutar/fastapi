@@ -16,7 +16,6 @@ def get_posts(db: Session = Depends(get_db), user: models.User = Depends(oauth2.
     # posts = cursor.fetchall()
 
     query = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Post.id == models.Vote.post_id, isouter=True).group_by(models.Post.id)
-    print("Query:",query)
     posts = query.filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts
 
@@ -56,11 +55,12 @@ def delete_post(id: int, db: Session = Depends(get_db), user: models.User = Depe
     query = db.query(models.Post).filter(models.Post.id == id)
     post = query.first()
 
-    if post.user_id != user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorised to perform requested action")
     if post is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with id: {id} was not found.")
-
+    
+    if post.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorised to perform requested action")
+    
     query.delete(synchronize_session=False)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

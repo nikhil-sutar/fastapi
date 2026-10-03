@@ -1,0 +1,27 @@
+services:
+  api:
+    build: .
+    ports: 
+      - 8000:8000
+    env_file:
+      - ./.env 
+    environment:
+      - DATABASE_HOSTNAME=postgres
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=nikhil
+      - POSTGRES_PASSWORD=pass1234
+      - POSTGRES_DB=fastapi
+
+    volumes:
+      - postgres-db:/var/lib/postgresql
+
+volumes:
+  postgres-db:
