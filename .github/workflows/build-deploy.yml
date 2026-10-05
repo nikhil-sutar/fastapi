@@ -49,17 +49,13 @@ jobs:
           pytest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [build]
     environment: production
     steps:
       - name: deploy to ubuntu server
-        uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USERNAME }}
-          password: ${{ secrets.PROD_PASSWORD }}
           script: |
-            cd app/scr
+            cd /home/nikhil/app/src
             git pull
-            echo ${{secrets.PROD_PASSWORD}} | sudo -S systemctl restart fastapi-demo
+            sudo systemctl restart fastapi-demo
