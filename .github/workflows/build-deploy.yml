@@ -54,8 +54,7 @@ jobs:
     environment: production
     steps:
       - name: deploy to ubuntu server
-        with:
-          script: |
-            cd /home/nikhil/app/src
-            git pull
-            sudo systemctl restart fastapi-demo
+        run: |
+          cd /home/nikhil/app/src
+          git pull
+          sudo systemctl restart fastapi-demo
